@@ -1,8 +1,9 @@
 "use client";
 
 import Link from "next/link";
-import { usePathname } from "next/navigation";
+import { usePathname, useRouter } from "next/navigation";
 import clsx from "clsx";
+import { useState } from "react";
 import {
   HomeIcon,
   CalendarIcon,
@@ -10,19 +11,29 @@ import {
   UserGroupIcon,
   ChartBarIcon,
   Cog6ToothIcon,
-  QuestionMarkCircleIcon,
 } from "@heroicons/react/24/outline";
+import { getSupabaseBrowserClient } from "@/lib/supabaseClient";
 
 const navItems = [
   { href: "/dashboard", label: "Dashboard", icon: HomeIcon },
   { href: "/schedule", label: "Schedule", icon: CalendarIcon },
   { href: "/properties", label: "Properties", icon: BuildingOfficeIcon },
   { href: "/cleaners", label: "Cleaners", icon: UserGroupIcon },
-  { href: "/reports", label: "Reports", icon: ChartBarIcon },
+  { href: "/logs", label: "Logs", icon: ChartBarIcon },
+  { href: "/settings", label: "Settings", icon: Cog6ToothIcon },
 ];
 
 export function Sidebar({ email }: { email?: string | null }) {
   const pathname = usePathname();
+  const router = useRouter();
+  const [signingOut, setSigningOut] = useState(false);
+
+  const handleSignOut = async () => {
+    setSigningOut(true);
+    const supabase = getSupabaseBrowserClient();
+    await supabase.auth.signOut();
+    router.replace("/login");
+  };
 
   return (
     <aside className="hidden w-64 flex-shrink-0 bg-gradient-to-b from-[#01161E] to-[#124559] p-6 md:flex md:flex-col">
@@ -84,21 +95,6 @@ export function Sidebar({ email }: { email?: string | null }) {
 
       {/* Footer Items */}
       <div className="mt-auto space-y-1">
-        <Link
-          href="/settings"
-          className="flex items-center gap-3 rounded-lg px-3 py-2 text-sm font-medium text-[#EFF6E0]/70 transition-all duration-200 hover:bg-[#124559]/40 hover:text-[#EFF6E0]"
-        >
-          <Cog6ToothIcon className="h-5 w-5 transition-transform duration-200 hover:scale-110" />
-          Settings
-        </Link>
-        <Link
-          href="/help"
-          className="flex items-center gap-3 rounded-lg px-3 py-2 text-sm font-medium text-[#EFF6E0]/70 transition-all duration-200 hover:bg-[#124559]/40 hover:text-[#EFF6E0]"
-        >
-          <QuestionMarkCircleIcon className="h-5 w-5 transition-transform duration-200 hover:scale-110" />
-          Help
-        </Link>
-
         {/* User Avatar Section */}
         <div className="mt-4 flex items-center gap-3 rounded-lg px-3 py-2">
           <div className="h-8 w-8 rounded-full bg-[#598392] flex items-center justify-center text-sm font-semibold text-[#EFF6E0]">
@@ -111,6 +107,13 @@ export function Sidebar({ email }: { email?: string | null }) {
             <span className="text-xs text-[#EFF6E0]/70">Manager</span>
           </div>
         </div>
+        <button
+          onClick={handleSignOut}
+          disabled={signingOut}
+          className="mt-2 w-full rounded-lg px-3 py-2 text-left text-sm font-medium text-[#EFF6E0]/70 transition-colors duration-200 hover:bg-[#124559]/40 hover:text-[#EFF6E0] disabled:opacity-50"
+        >
+          {signingOut ? "Signing out..." : "Sign out"}
+        </button>
       </div>
     </aside>
   );

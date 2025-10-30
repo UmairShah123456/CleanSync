@@ -17,7 +17,7 @@ export function Topbar({ email }: { email?: string | null }) {
   };
 
   return (
-    <header className="flex items-center justify-between border-b border-[#124559]/30 bg-[#01161E] px-6 py-4">
+    <header className="flex items-center justify-between border-b border-[#124559]/30 bg-[#01161E] px-4 lg:px-5 py-4">
       <div>
         <h1 className="text-lg font-semibold text-[#EFF6E0]">CleanSync</h1>
         <p className="text-sm text-[#EFF6E0]/70">

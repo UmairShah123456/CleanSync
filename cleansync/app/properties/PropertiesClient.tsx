@@ -88,16 +88,21 @@ export function PropertiesClient({
     <AppShell email={email}>
       <div className="flex items-center justify-between">
         <div>
-          <h2 className="text-2xl font-semibold text-slate-900">Properties</h2>
-          <p className="mt-1 text-sm text-slate-500">
+          <h2 className="text-2xl font-semibold text-[#EFF6E0]">Properties</h2>
+          <p className="mt-1 text-sm text-[#EFF6E0]/70">
             Manage each rental and its connected calendar feed.
           </p>
         </div>
-        <Button onClick={() => setModalOpen(true)}>Add property</Button>
+        <button
+          onClick={() => setModalOpen(true)}
+          className="rounded-full bg-gradient-to-r from-[#124559] to-[#598392] px-4 py-2 text-sm font-semibold text-[#EFF6E0] shadow-md transition-all duration-200 hover:shadow-lg"
+        >
+          Add property
+        </button>
       </div>
 
       {error ? (
-        <div className="rounded-2xl border border-red-200 bg-red-50 p-4 text-sm text-red-700">
+        <div className="rounded-xl border border-red-500/40 bg-red-500/10 p-4 text-sm text-red-300">
           {error}
         </div>
       ) : null}

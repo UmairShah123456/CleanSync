@@ -32,7 +32,9 @@ export function AddPropertyModal({
       onClose={onClose}
       footer={null}
     >
-      <PropertyForm onSubmit={handleSubmit} submitting={loading} />
+      <div className="text-[#EFF6E0]">
+        <PropertyForm onSubmit={handleSubmit} submitting={loading} />
+      </div>
     </Modal>
   );
 }

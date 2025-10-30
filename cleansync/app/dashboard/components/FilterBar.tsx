@@ -19,6 +19,7 @@ export function FilterBar({
   lastSynced?: Date | null;
 }) {
   const [filters, setFilters] = useState<FilterState>({});
+  const [dateRange, setDateRange] = useState<string>("");
   const [showFilters, setShowFilters] = useState(false);
 
   const updateFilters = (updater: (prev: FilterState) => FilterState) => {
@@ -31,6 +32,7 @@ export function FilterBar({
 
   const handleReset = () => {
     setFilters({});
+    setDateRange("");
     onFilterChange({});
   };
 
@@ -71,7 +73,56 @@ export function FilterBar({
 
         {/* Date Range Dropdown */}
         <div className="relative flex-1">
-          <select className="w-full appearance-none rounded-full bg-[#124559]/40 px-4 py-2 text-sm text-[#EFF6E0] focus:outline-none focus:ring-2 focus:ring-[#598392] border border-[#124559]/50">
+          <select
+            value={dateRange}
+            onChange={(e) => {
+              const val = e.target.value;
+              setDateRange(val);
+              if (!val) {
+                updateFilters((prev) => ({
+                  ...prev,
+                  from: undefined,
+                  to: undefined,
+                }));
+                return;
+              }
+              const now = new Date();
+              let from: string | undefined;
+              let to: string | undefined;
+              if (val === "today") {
+                const start = new Date(now);
+                start.setHours(0, 0, 0, 0);
+                const end = new Date(now);
+                end.setHours(23, 59, 59, 999);
+                from = start.toISOString();
+                to = end.toISOString();
+              } else if (val === "week") {
+                const start = new Date(now);
+                // assume week = next 7 days (inclusive)
+                start.setHours(0, 0, 0, 0);
+                const end = new Date(start);
+                end.setDate(start.getDate() + 7);
+                end.setHours(23, 59, 59, 999);
+                from = start.toISOString();
+                to = end.toISOString();
+              } else if (val === "month") {
+                const start = new Date(now.getFullYear(), now.getMonth(), 1);
+                const end = new Date(
+                  now.getFullYear(),
+                  now.getMonth() + 1,
+                  0,
+                  23,
+                  59,
+                  59,
+                  999
+                );
+                from = start.toISOString();
+                to = end.toISOString();
+              }
+              updateFilters((prev) => ({ ...prev, from, to }));
+            }}
+            className="w-full appearance-none rounded-full bg-[#124559]/40 px-4 py-2 text-sm text-[#EFF6E0] focus:outline-none focus:ring-2 focus:ring-[#598392] border border-[#124559]/50"
+          >
             <option value="">Date Range</option>
             <option value="today">Today</option>
             <option value="week">This Week</option>
