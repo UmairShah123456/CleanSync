@@ -1,12 +1,12 @@
 "use client";
 
-import { useCallback, useMemo, useState } from "react";
+import { useCallback, useMemo, useState, useEffect } from "react";
 import { AppShell } from "@/components/layout/AppShell";
-import { StatsCards } from "./components/StatsCards";
-import { CleanTable, type CleanRow } from "./components/CleanTable";
+import { DashboardHeader } from "./components/DashboardHeader";
+import { MetricCard } from "./components/MetricCard";
+import { CleansTable, type CleanRow } from "./components/CleansTable";
 import { FilterBar } from "./components/FilterBar";
 import type { FilterState } from "@/components/forms/FilterForm";
-import { Spinner } from "@/components/ui/Spinner";
 
 async function fetchCleansWithFilters(filters: FilterState) {
   const params = new URLSearchParams();
@@ -30,28 +30,39 @@ async function fetchCleansWithFilters(filters: FilterState) {
   return (await response.json()) as CleanRow[];
 }
 
-const calculateStats = (cleans: CleanRow[]) => {
+const calculateMetrics = (cleans: CleanRow[]) => {
   const now = Date.now();
   const inThirtyDays = now + 30 * 24 * 60 * 60 * 1000;
 
   let upcoming = 0;
-  let sameDay = 0;
-  let cancelled = 0;
+  let issues = 0;
+  let lateCheckouts = 0;
+  let paymentsDue = 0;
 
   for (const clean of cleans) {
     const scheduled = new Date(clean.scheduled_for).getTime();
-    if (clean.status === "scheduled" && scheduled >= now && scheduled <= inThirtyDays) {
+    if (
+      clean.status === "scheduled" &&
+      scheduled >= now &&
+      scheduled <= inThirtyDays
+    ) {
       upcoming += 1;
     }
     if (clean.status === "cancelled") {
-      cancelled += 1;
+      issues += 1;
     }
-    if (clean.notes?.includes("⚠️")) {
-      sameDay += 1;
+    if (
+      clean.notes?.includes("⚠️") ||
+      clean.notes?.toLowerCase().includes("late")
+    ) {
+      lateCheckouts += 1;
+    }
+    if (clean.status === "completed" && scheduled < now - 24 * 60 * 60 * 1000) {
+      paymentsDue += 1;
     }
   }
 
-  return { upcoming, sameDay, cancelled } as const;
+  return { upcoming, issues, lateCheckouts, paymentsDue } as const;
 };
 
 export function DashboardClient({
@@ -67,26 +78,24 @@ export function DashboardClient({
   const [filters, setFilters] = useState<FilterState>({});
   const [loading, setLoading] = useState(false);
   const [syncing, setSyncing] = useState(false);
+  const [lastSynced, setLastSynced] = useState<Date | null>(null);
   const [error, setError] = useState<string | null>(null);
 
-  const stats = useMemo(() => calculateStats(cleans), [cleans]);
+  const metrics = useMemo(() => calculateMetrics(cleans), [cleans]);
 
-  const handleFilterChange = useCallback(
-    async (nextFilters: FilterState) => {
-      setFilters(nextFilters);
-      setLoading(true);
-      setError(null);
-      try {
-        const data = await fetchCleansWithFilters(nextFilters);
-        setCleans(data);
-      } catch (err) {
-        setError(err instanceof Error ? err.message : "Unable to fetch cleans.");
-      } finally {
-        setLoading(false);
-      }
-    },
-    []
-  );
+  const handleFilterChange = useCallback(async (nextFilters: FilterState) => {
+    setFilters(nextFilters);
+    setLoading(true);
+    setError(null);
+    try {
+      const data = await fetchCleansWithFilters(nextFilters);
+      setCleans(data);
+    } catch (err) {
+      setError(err instanceof Error ? err.message : "Unable to fetch cleans.");
+    } finally {
+      setLoading(false);
+    }
+  }, []);
 
   const handleSync = useCallback(async () => {
     setSyncing(true);
@@ -96,6 +105,7 @@ export function DashboardClient({
       if (!response.ok) {
         throw new Error("Sync failed");
       }
+      setLastSynced(new Date());
       const fresh = await fetchCleansWithFilters(filters);
       setCleans(fresh);
     } catch (err) {
@@ -107,25 +117,62 @@ export function DashboardClient({
 
   return (
     <AppShell email={email}>
-      <StatsCards stats={stats} />
-      <FilterBar
-        properties={properties}
-        onFilterChange={handleFilterChange}
-        onSync={handleSync}
-        syncing={syncing}
-      />
-      {error ? (
-        <div className="rounded-2xl border border-red-200 bg-red-50 p-4 text-sm text-red-700">
-          {error}
+      <div className="space-y-6">
+        <DashboardHeader />
+
+        {/* Metric Cards */}
+        <div className="grid grid-cols-1 gap-4 overflow-x-auto sm:grid-cols-2 lg:grid-cols-4">
+          <MetricCard
+            value={metrics.upcoming}
+            label="Upcoming Cleanings"
+            subtext="Within next 30 days"
+            delay={0}
+          />
+          <MetricCard
+            value={metrics.issues}
+            label="Issues to Resolve"
+            subtext="Requires attention"
+            delay={100}
+          />
+          <MetricCard
+            value={metrics.lateCheckouts}
+            label="Late Checkouts"
+            subtext="Needs immediate action"
+            delay={200}
+          />
+          <MetricCard
+            value={metrics.paymentsDue}
+            label="Payments Due"
+            subtext="Pending payment"
+            delay={300}
+          />
         </div>
-      ) : null}
-      {loading ? (
-        <div className="flex items-center justify-center rounded-2xl border border-slate-200 bg-white p-12 text-sm text-slate-500">
-          <Spinner className="mr-3" size="sm" /> Loading cleans...
-        </div>
-      ) : (
-        <CleanTable cleans={cleans} />
-      )}
+
+        {/* Filter Bar */}
+        <FilterBar
+          properties={properties}
+          onFilterChange={handleFilterChange}
+          onSync={handleSync}
+          syncing={syncing}
+          lastSynced={lastSynced}
+        />
+
+        {/* Error Message */}
+        {error && (
+          <div className="rounded-xl bg-red-500/20 border border-red-500/50 p-4 text-sm text-red-300">
+            {error}
+          </div>
+        )}
+
+        {/* Loading State */}
+        {loading ? (
+          <div className="flex items-center justify-center rounded-xl bg-[#124559] p-12 text-sm text-[#EFF6E0]/70 border border-[#124559]/50">
+            Loading cleans...
+          </div>
+        ) : (
+          <CleansTable cleans={cleans} />
+        )}
+      </div>
     </AppShell>
   );
 }

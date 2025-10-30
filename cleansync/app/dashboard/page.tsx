@@ -35,7 +35,25 @@ export default async function DashboardPage() {
     cleans = data ?? [];
   }
 
-  const propertyLookup = new Map(properties.map((property) => [property.id, property.name]));
+  const propertyLookup = new Map(
+    properties.map((property) => [property.id, property.name])
+  );
+
+  // Fetch related booking check-in/out times for these cleans
+  let bookingMap = new Map<
+    string,
+    { checkin: string | null; checkout: string | null }
+  >();
+  if (cleans.length) {
+    const bookingUids = cleans.map((c: any) => c.booking_uid);
+    const { data: bookings } = await supabase
+      .from("bookings")
+      .select("uid, checkin, checkout")
+      .in("uid", bookingUids);
+    bookings?.forEach((b: any) =>
+      bookingMap.set(b.uid, { checkin: b.checkin, checkout: b.checkout })
+    );
+  }
 
   const initialCleans = cleans.map((clean) => ({
     id: clean.id,
@@ -45,6 +63,8 @@ export default async function DashboardPage() {
     scheduled_for: clean.scheduled_for,
     status: clean.status,
     notes: clean.notes,
+    checkin: bookingMap.get(clean.booking_uid)?.checkin ?? null,
+    checkout: bookingMap.get(clean.booking_uid)?.checkout ?? null,
   }));
 
   return (

@@ -18,7 +18,7 @@ type BookingRecord = {
   status: string;
 };
 
-const SAME_DAY_NOTE = "⚠️ Same-day check-in detected.";
+const SAME_DAY_NOTE = "⚠️ Same-day check-in.";
 const CANCELLATION_NOTE =
   "❌ This clean has been removed due to a cancellation.";
 
@@ -66,7 +66,9 @@ const ensureClean = async (
     .maybeSingle();
 
   if (error) {
-    throw new Error(`Failed to read clean for booking ${event.uid}: ${error.message}`);
+    throw new Error(
+      `Failed to read clean for booking ${event.uid}: ${error.message}`
+    );
   }
 
   if (!data) {
@@ -103,10 +105,7 @@ const ensureClean = async (
   }
 };
 
-const cancelBookingAndClean = async (
-  supabase: SupabaseClient,
-  uid: string
-) => {
+const cancelBookingAndClean = async (supabase: SupabaseClient, uid: string) => {
   const timestamp = new Date().toISOString();
 
   const { error: bookingError } = await supabase
@@ -115,9 +114,7 @@ const cancelBookingAndClean = async (
     .eq("uid", uid);
 
   if (bookingError) {
-    throw new Error(
-      `Failed to cancel booking ${uid}: ${bookingError.message}`
-    );
+    throw new Error(`Failed to cancel booking ${uid}: ${bookingError.message}`);
   }
 
   const { error: cleanError } = await supabase
@@ -141,8 +138,7 @@ const hasSameDayTurnover = (
   events: CalendarEvent[]
 ): boolean => {
   return events.some(
-    (other) =>
-      other.uid !== event.uid && isSameDay(other.start, event.end)
+    (other) => other.uid !== event.uid && isSameDay(other.start, event.end)
   );
 };
 

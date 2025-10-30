@@ -17,18 +17,22 @@ export function Topbar({ email }: { email?: string | null }) {
   };
 
   return (
-    <header className="flex items-center justify-between border-b border-slate-200 bg-white px-6 py-4">
+    <header className="flex items-center justify-between border-b border-[#124559]/30 bg-[#01161E] px-6 py-4">
       <div>
-        <h1 className="text-lg font-semibold text-slate-900">CleanSync</h1>
-        <p className="text-sm text-slate-500">Automated turnovers for your rentals</p>
+        <h1 className="text-lg font-semibold text-[#EFF6E0]">CleanSync</h1>
+        <p className="text-sm text-[#EFF6E0]/70">
+          Automated turnovers for your rentals
+        </p>
       </div>
-      <div className="flex items-center gap-3 text-sm text-slate-600">
-        {email ? <span className="hidden text-slate-500 md:block">{email}</span> : null}
+      <div className="flex items-center gap-3 text-sm text-[#EFF6E0]/70">
+        {email ? (
+          <span className="hidden text-[#EFF6E0]/70 md:block">{email}</span>
+        ) : null}
         <Button
           variant="ghost"
           onClick={handleSignOut}
           disabled={loading}
-          className="text-slate-500 hover:text-slate-900"
+          className="text-[#EFF6E0]/70 hover:text-[#EFF6E0]"
         >
           {loading ? "Signing out..." : "Sign out"}
         </Button>

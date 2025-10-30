@@ -13,10 +13,7 @@ export async function GET(request: NextRequest) {
   } = await supabase.auth.getUser();
 
   if (userError) {
-    return NextResponse.json(
-      { error: userError.message },
-      { status: 500 }
-    );
+    return NextResponse.json({ error: userError.message }, { status: 500 });
   }
 
   if (!user) {
@@ -87,9 +84,16 @@ export async function GET(request: NextRequest) {
     return NextResponse.json({ error: error.message }, { status: 500 });
   }
 
-  const response = (data ?? []).map((clean) => ({
-    ...clean,
+  const response = (data ?? []).map((clean: any) => ({
+    id: clean.id,
+    booking_uid: clean.booking_uid,
+    property_id: clean.property_id,
     property_name: propertyLookup.get(clean.property_id) ?? "Unknown property",
+    scheduled_for: clean.scheduled_for,
+    status: clean.status,
+    notes: clean.notes,
+    checkin: clean.bookings?.checkin ?? null,
+    checkout: clean.bookings?.checkout ?? null,
   }));
 
   return NextResponse.json(response);

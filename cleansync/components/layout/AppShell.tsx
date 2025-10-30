@@ -10,12 +10,12 @@ export function AppShell({
   email?: string | null;
 }) {
   return (
-    <div className="min-h-screen bg-slate-50">
+    <div className="min-h-screen bg-[#01161E]">
       <div className="flex h-screen flex-col md:flex-row">
-        <Sidebar />
+        <Sidebar email={email} />
         <div className="flex flex-1 flex-col">
           <Topbar email={email} />
-          <main className="flex-1 overflow-y-auto bg-slate-50 p-6">
+          <main className="flex-1 overflow-y-auto bg-[#01161E] p-6">
             <div className="mx-auto max-w-6xl space-y-6">{children}</div>
           </main>
         </div>
