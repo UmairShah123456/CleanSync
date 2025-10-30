@@ -13,7 +13,7 @@ export function AppShell({
       <div className="flex h-screen flex-col md:flex-row">
         <Sidebar email={email} />
         <div className="flex flex-1 flex-col">
-          <main className="flex-1 overflow-y-auto bg-[#01161E] p-4 lg:p-5">
+          <main className="flex-1 overflow-y-auto bg-[#01161E] p-6 md:p-8">
             <div className="space-y-6">{children}</div>
           </main>
         </div>

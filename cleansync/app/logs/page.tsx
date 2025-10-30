@@ -26,19 +26,23 @@ export default async function LogsPage() {
   if (!properties.length) {
     return (
       <AppShell email={user.email}>
-        <div className="rounded-2xl border border-dashed border-slate-300 bg-white p-12 text-center text-sm text-slate-500">
+        <div className="rounded-xl border border-dashed border-[#598392]/30 bg-[#124559] p-12 text-center text-sm text-[#EFF6E0]/70">
           Add a property to see sync activity logs.
         </div>
       </AppShell>
     );
   }
 
-  const propertyLookup = new Map(properties.map((property) => [property.id, property.name]));
+  const propertyLookup = new Map(
+    properties.map((property) => [property.id, property.name])
+  );
   const propertyIds = properties.map((property) => property.id);
 
   const { data: logsData } = await supabase
     .from("sync_logs")
-    .select("id, property_id, run_at, bookings_added, bookings_removed, bookings_updated")
+    .select(
+      "id, property_id, run_at, bookings_added, bookings_removed, bookings_updated"
+    )
     .in("property_id", propertyIds)
     .order("run_at", { ascending: false })
     .limit(50);
@@ -52,9 +56,9 @@ export default async function LogsPage() {
 
   return (
     <AppShell email={user.email}>
-      <div>
-        <h2 className="text-2xl font-semibold text-slate-900">Sync activity</h2>
-        <p className="mt-1 text-sm text-slate-500">
+      <div className="animate-fadeIn">
+        <h2 className="text-2xl font-semibold text-[#EFF6E0]">Sync activity</h2>
+        <p className="mt-1 text-sm text-[#EFF6E0]/70">
           Review what changed during each background sync.
         </p>
       </div>
