@@ -49,7 +49,7 @@ export function FilterBar({
     <div className="animate-fadeIn">
       {/* Desktop Filter Bar */}
       <div className="hidden md:flex items-center gap-3 rounded-xl bg-[#124559]/20 backdrop-blur-sm p-4 border border-[#124559]/30">
-        {/* Property Name Dropdown */}
+        {/* Property Dropdown */}
         <div className="relative flex-1">
           <select
             value={filters.propertyId ?? ""}
@@ -61,7 +61,7 @@ export function FilterBar({
             }
             className="w-full appearance-none rounded-full bg-[#124559]/40 px-4 py-2 text-sm text-[#EFF6E0] focus:outline-none focus:ring-2 focus:ring-[#598392] border border-[#124559]/50"
           >
-            <option value="">Property Name</option>
+            <option value="">All Properties</option>
             {properties.map((property) => (
               <option key={property.id} value={property.id}>
                 {property.name}
@@ -98,7 +98,6 @@ export function FilterBar({
                 to = end.toISOString();
               } else if (val === "week") {
                 const start = new Date(now);
-                // assume week = next 7 days (inclusive)
                 start.setHours(0, 0, 0, 0);
                 const end = new Date(start);
                 end.setDate(start.getDate() + 7);
@@ -123,7 +122,7 @@ export function FilterBar({
             }}
             className="w-full appearance-none rounded-full bg-[#124559]/40 px-4 py-2 text-sm text-[#EFF6E0] focus:outline-none focus:ring-2 focus:ring-[#598392] border border-[#124559]/50"
           >
-            <option value="">Date Range</option>
+            <option value="">All Time</option>
             <option value="today">Today</option>
             <option value="week">This Week</option>
             <option value="month">This Month</option>
@@ -143,7 +142,7 @@ export function FilterBar({
             }
             className="w-full appearance-none rounded-full bg-[#124559]/40 px-4 py-2 text-sm text-[#EFF6E0] focus:outline-none focus:ring-2 focus:ring-[#598392] border border-[#124559]/50"
           >
-            <option value="">Job Status</option>
+            <option value="">All Statuses</option>
             <option value="scheduled">Scheduled</option>
             <option value="completed">Completed</option>
             <option value="cancelled">Cancelled</option>

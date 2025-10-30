@@ -8,9 +8,9 @@ import {
   HomeIcon,
   CalendarIcon,
   BuildingOfficeIcon,
-  UserGroupIcon,
   ChartBarIcon,
   Cog6ToothIcon,
+  ArrowRightOnRectangleIcon,
 } from "@heroicons/react/24/outline";
 import { getSupabaseBrowserClient } from "@/lib/supabaseClient";
 
@@ -18,7 +18,6 @@ const navItems = [
   { href: "/dashboard", label: "Dashboard", icon: HomeIcon },
   { href: "/schedule", label: "Schedule", icon: CalendarIcon },
   { href: "/properties", label: "Properties", icon: BuildingOfficeIcon },
-  { href: "/cleaners", label: "Cleaners", icon: UserGroupIcon },
   { href: "/logs", label: "Logs", icon: ChartBarIcon },
   { href: "/settings", label: "Settings", icon: Cog6ToothIcon },
 ];
@@ -110,8 +109,9 @@ export function Sidebar({ email }: { email?: string | null }) {
         <button
           onClick={handleSignOut}
           disabled={signingOut}
-          className="mt-2 w-full rounded-lg px-3 py-2 text-left text-sm font-medium text-[#EFF6E0]/70 transition-colors duration-200 hover:bg-[#124559]/40 hover:text-[#EFF6E0] disabled:opacity-50"
+          className="mt-2 w-full rounded-lg px-3 py-2 text-left text-sm font-medium text-[#EFF6E0]/70 transition-colors duration-200 hover:bg-[#124559]/40 hover:text-[#EFF6E0] disabled:opacity-50 flex items-center gap-2"
         >
+          <ArrowRightOnRectangleIcon className="h-5 w-5" />
           {signingOut ? "Signing out..." : "Sign out"}
         </button>
       </div>
