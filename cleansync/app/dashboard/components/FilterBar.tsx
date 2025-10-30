@@ -25,7 +25,6 @@ export function FilterBar({
   const updateFilters = (updater: (prev: FilterState) => FilterState) => {
     setFilters((prev) => {
       const next = updater(prev);
-      onFilterChange(next);
       return next;
     });
   };
@@ -33,8 +32,13 @@ export function FilterBar({
   const handleReset = () => {
     setFilters({});
     setDateRange("");
-    onFilterChange({});
   };
+
+  // Propagate filter changes to parent AFTER render commit to avoid setState during render
+  useEffect(() => {
+    onFilterChange(filters);
+    // eslint-disable-next-line react-hooks/exhaustive-deps
+  }, [filters]);
 
   const getLastSyncedText = () => {
     if (!lastSynced) return "Never synced";
